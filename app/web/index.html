@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Executeur de Code</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f4f4f4;
+      }
+
+      .container {
+        width: 80%;
+        max-width: 600px;
+      }
+
+      textarea {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        min-height: 30vh;
+      }
+
+      #output {
+        background-color: #eee;
+        color: black;
+      }
+
+      button {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>JS Playground</h1>
+      <textarea
+        id="codeInput"
+        placeholder="Entrez votre code ici..."
+      ></textarea>
+      <button id="executeButton">Exécuter le Code</button>
+      <textarea id="output" readonly></textarea>
+    </div>
+    <script>
+      document
+        .getElementById("executeButton")
+        .addEventListener("click", function () {
+          const code = document.getElementById("codeInput").value;
+          const output = document.getElementById("output");
+
+          fetch("/execute", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ code: code }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                output.classList.add("error");
+                output.value = data.error;
+                // set text in red
+                output.style = "color: red";
+              } else {
+                output.style = "color: black";
+
+                output.classList.remove("error");
+                output.value = data.output;
+              }
+            })
+            .catch((error) => {
+              output.classList.add("error");
+              output.value = "Erreur lors de l'exécution du code: " + error;
+            });
+        });
+    </script>
+  </body>
+</html>
