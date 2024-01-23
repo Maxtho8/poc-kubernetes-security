@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: fix-limit-runners
+spec:
+  rules:
+    - name: fix-limit-runners
+      precondition:
+      any:
+        - key: "{{limits.cpu}}"
+          operator: GreaterThan
+          value: 1
+        - key: "{{limits.memory}}"
+          operator: GreaterThan
+          value: 1Gi
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      mutate:
+        patchStrategicMerge:
+          spec:
+            containers:
+              ressources:
+                limits:
+                  cpu: 1
+                  memory: 1Gi

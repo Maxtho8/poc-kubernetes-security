@@ -1,0 +1,31 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-labels
+  annotations:
+    policies.kyverno.io/title: Require Labels
+    policies.kyverno.io/category: Labeling
+    policies.kyverno.io/minversion: 1.6.0
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod, Label
+    policies.kyverno.io/description: >-
+      This policy requires that all pods have the label app and component.
+      app is the name of the application
+      component is the function of the pod
+spec:
+  validationFailureAction: enforce
+  background: false
+  rules:
+    - name: check-for-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "The label app and component is required."
+        pattern:
+          metadata:
+            labels:
+              app: "?*"
+              component: "?*"

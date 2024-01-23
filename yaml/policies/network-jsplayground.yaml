@@ -1,0 +1,45 @@
+# Webapp accept all incoming traffic but can only send traffic to runner
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jsplayground-webapp-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: jsplayground
+      component: runner
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: jsplayground
+              component: runner
+      ports:
+        - protocol: TCP
+          port: 8081
+---
+# Runner can only accept traffic from webapp
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: jsplayground-runner-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: jsplayground
+      component: runner
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: jsplayground
+              component: webapp
+      ports:
+        - protocol: TCP
+          port: 8081
