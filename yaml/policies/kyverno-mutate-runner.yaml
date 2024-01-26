@@ -5,24 +5,24 @@ metadata:
 spec:
   rules:
     - name: fix-limit-runners
-      precondition:
-      any:
-        - key: "{{limits.cpu}}"
-          operator: GreaterThan
-          value: 1
-        - key: "{{limits.memory}}"
-          operator: GreaterThan
-          value: 1Gi
-      match:
+      preconditions:
         any:
-          - resources:
-              kinds:
-                - Pod
+          - key: "{{ request.object.spec.containers[*].resources.limits.cpu }}"
+            operator: GreaterThan
+            value: 1
+          - key: "{{ request.object.spec.containers[*].resources.limits.memory }}"
+            operator: GreaterThan
+            value: 1Gi
+      match:
+        resources:
+          kinds:
+            - Pod
       mutate:
         patchStrategicMerge:
           spec:
             containers:
-              ressources:
-                limits:
-                  cpu: 1
-                  memory: 1Gi
+              - name: "*"
+                resources:
+                  limits:
+                    cpu: 1
+                    memory: 1Gi
