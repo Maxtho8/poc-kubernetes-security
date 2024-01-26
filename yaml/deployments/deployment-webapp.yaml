@@ -1,11 +1,13 @@
-# Deploying Web app and Runner
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jsplayground-webapp-deployment
-  labels:
-    app: nginx
 spec:
+  replicas: 1 # You can adjust the number of replicas
+  selector:
+    matchLabels:
+      app: jsplayground
+      component: webapp
   template:
     metadata:
       labels:
@@ -14,9 +16,16 @@ spec:
     spec:
       containers:
         - name: webapp
-          image: jsplayground/web:latest
+          image: maxtho/jsplayground:web
           ports:
             - containerPort: 8080
           env:
             - name: RUNNER_URL
               value: http://jsplayground-runner-service
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+            requests:
+              cpu: 1
+              memory: 1Gi
